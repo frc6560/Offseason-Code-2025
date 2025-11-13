@@ -1,0 +1,79 @@
+package frc.robot;
+
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.subsystems.superstructure.Arm;
+import frc.robot.subsystems.superstructure.BallGrabber;
+import frc.robot.subsystems.superstructure.Elevator;
+import frc.robot.subsystems.superstructure.SubsystemManager;
+import frc.robot.commands.ArmCommand;
+import frc.robot.commands.ElevatorCommand;
+import frc.robot.commands.BallGrabberCommand;
+import java.io.File;
+import swervelib.SwerveInputStream;
+import frc.robot.commands.SubsystemManagerCommand;
+
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+
+
+public class RobotContainer {
+
+    // Controllers
+    private final CommandXboxController driverXbox = new CommandXboxController(0);
+    private final XboxController firstXbox = new XboxController(0);
+    private final XboxController secondXbox = new XboxController(1);
+    private final ManualControls controls = new ManualControls(firstXbox, secondXbox);
+
+     // The robot's subsystems and commands are defined here...
+    private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+    "swerve/falcon"));
+
+    // Subsystems
+    private final Elevator elevator = new Elevator();
+    private final Arm arm = new Arm();
+    private final BallGrabber ballGrabber = new BallGrabber();
+    private final SubsystemManager subsystemManager = new SubsystemManager(drivebase, elevator, arm, ballGrabber, controls);
+
+    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
+      .withControllerRotationAxis(() -> -driverXbox.getRightX())
+      .deadband(OperatorConstants.DEADBAND)
+      .scaleTranslation(0.8)
+      .allianceRelativeControl(true);
+
+
+    public RobotContainer() {
+      arm.setDefaultCommand(new ArmCommand(arm, controls));
+      configureBindings();
+
+      elevator.setDefaultCommand(new ElevatorCommand(elevator,controls));
+      ballGrabber.setDefaultCommand(new BallGrabberCommand(ballGrabber, controls));
+      subsystemManager.setDefaultCommand(new SubsystemManagerCommand(drivebase, elevator, arm, ballGrabber, controls, subsystemManager));
+      
+
+    }
+
+    private void configureBindings() {
+        Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+        drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+
+        driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+        driverXbox.y().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
+        driverXbox.x().onTrue(Commands.runOnce(drivebase::sysIdDriveMotorCommand));
+        driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroNoAprilTagsGyro)));
+        driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+        driverXbox.rightBumper().onTrue(Commands.none());
+    
+    }
+
+    public Command getAutonomousCommand() {
+      return Commands.run(() -> drivebase.drive(new ChassisSpeeds(-0.5, 0, 0)), drivebase).withTimeout(2);   
+    }
+}
