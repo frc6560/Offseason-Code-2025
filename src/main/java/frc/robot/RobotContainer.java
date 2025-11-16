@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.superstructure.Arm;
 import frc.robot.subsystems.superstructure.BallGrabber;
 import frc.robot.subsystems.superstructure.Elevator;
@@ -14,11 +16,15 @@ import frc.robot.commands.ArmCommand;
 import frc.robot.commands.ElevatorCommand;
 import frc.robot.commands.BallGrabberCommand;
 import java.io.File;
+
 import swervelib.SwerveInputStream;
 import frc.robot.commands.SubsystemManagerCommand;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.autonomous.Auto;
+import frc.robot.autonomous.AutoFactory;
+import frc.robot.autonomous.AutoRoutines;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 
@@ -40,6 +46,9 @@ public class RobotContainer {
     private final BallGrabber ballGrabber = new BallGrabber();
     private final SubsystemManager subsystemManager = new SubsystemManager(drivebase, elevator, arm, ballGrabber, controls);
 
+    private final AutoFactory factory;
+    private final SendableChooser<Auto> autoChooser;
+
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
@@ -57,14 +66,29 @@ public class RobotContainer {
       ballGrabber.setDefaultCommand(new BallGrabberCommand(ballGrabber, controls));
       subsystemManager.setDefaultCommand(new SubsystemManagerCommand(drivebase, elevator, arm, ballGrabber, controls, subsystemManager));
       
+      factory = new AutoFactory(
+      null,
+      drivebase
+      );
 
+      autoChooser = new SendableChooser<Auto>();
+
+      for(AutoRoutines auto : AutoRoutines.values()) {
+        Auto autonomousRoutine = new Auto(auto, null);
+        if(auto == AutoRoutines.TEST){
+          autoChooser.setDefaultOption(autonomousRoutine.getName(), autonomousRoutine);
+        }
+        else {
+          autoChooser.addOption(autonomousRoutine.getName(), autonomousRoutine);
+        }
+      }
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private void configureBindings() {
         Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-
-        driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
         driverXbox.y().onTrue(Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
         driverXbox.x().onTrue(Commands.runOnce(drivebase::sysIdDriveMotorCommand));
         driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroNoAprilTagsGyro)));
@@ -74,6 +98,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-      return Commands.run(() -> drivebase.drive(new ChassisSpeeds(-0.5, 0, 0)), drivebase).withTimeout(2);   
+      return autoChooser.getSelected().getCommand();
     }
 }

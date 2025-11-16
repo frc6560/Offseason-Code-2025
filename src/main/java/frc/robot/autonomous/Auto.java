@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 
+
 /** Defines an Auto class, which is a name, an enum ID, and a command. */
 public class Auto {
     private final AutoRoutines autoRoutine;
@@ -12,8 +13,8 @@ public class Auto {
     private Pair<Pose2d, Command> autoCommand;
     private final AutoFactory factory;
 
-    public Auto(AutoRoutines autoRoutine, AutoFactory factory){
-        this.autoRoutine = autoRoutine;
+    public Auto(AutoRoutines auto, AutoFactory factory){
+        this.autoRoutine = auto;
         this.factory = factory;
         this.autoCommand = null;
         this.name = getAutos().getSecond();

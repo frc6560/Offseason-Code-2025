@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -30,6 +32,10 @@ public final class Constants {
     public static final double kStdvX = 0.08; // TODO: tune once i get my hands on LL
     public static final double kStdvY = 0.08; 
     public static final double kStdvTheta = 3;
+  }
+
+  public static final class FieldConstants{
+    public static final Pose2d START = new Pose2d(3.152, 4.018, Rotation2d.fromDegrees(0));
   }
 
   public static class OperatorConstants
