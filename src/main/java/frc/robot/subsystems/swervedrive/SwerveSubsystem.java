@@ -19,7 +19,9 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -28,10 +30,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
@@ -68,6 +72,8 @@ public class SwerveSubsystem extends SubsystemBase {
   Matrix<N3, N1> visionStdDevs = VecBuilder.fill(DrivebaseConstants.kStdvX,
                                                  DrivebaseConstants.kStdvY, 
                                                  DrivebaseConstants.kStdvTheta);
+
+  PIDController angleController = new PIDController(5.0, 0.0, 0.0); // tune values
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -123,7 +129,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public void updateVisionPoseEstimator(){
     Pose2d emptyPose = new Pose2d();
     // This is viewed top down, facing the front of the robot
-    String[] limelightNames = {"limelight-right", "limelight-left"};
+    String[] limelightNames = {"limelight-left"};
     // Vision fusion
     for( String limelightName : limelightNames) {
       LimelightHelpers.SetRobotOrientation(limelightName, swerveDrive.getOdometryHeading().getDegrees(), 0, 0, 0, 0, 0);
@@ -144,8 +150,34 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.addVisionMeasurement(limelightPose, adjustedTime);
       }
     }
-
   }
+
+  double tx;
+
+  public Command trackAprilTag(){
+    LinearFilter filter = LinearFilter.movingAverage(5);
+    Command trackAprilTagCommand = new FunctionalCommand(
+      () -> {
+      },
+      () -> {
+        tx = LimelightHelpers.getTX("limelight-left");
+        double tx_rad = Units.degreesToRadians(tx);
+        tx_rad = filter.calculate(tx_rad);
+        double thetaOutput = angleController.calculate(tx_rad, 0);
+        if(Math.abs(tx) < 1.0){
+          drive(new ChassisSpeeds(
+            0,
+            0,
+            thetaOutput
+          ));
+        }
+      },
+      (interrupted) -> {
+        drive(new ChassisSpeeds());
+      },
+      () -> Math.abs(tx) < 1.0);
+      return trackAprilTagCommand;
+    }
 
   @Override
   public void simulationPeriodic(){
