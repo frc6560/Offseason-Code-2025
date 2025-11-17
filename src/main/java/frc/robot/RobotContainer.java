@@ -74,7 +74,7 @@ public class RobotContainer {
       autoChooser = new SendableChooser<Auto>();
 
       for(AutoRoutines auto : AutoRoutines.values()) {
-        Auto autonomousRoutine = new Auto(auto, null);
+        Auto autonomousRoutine = new Auto(auto, factory);
         if(auto == AutoRoutines.TEST){
           autoChooser.setDefaultOption(autonomousRoutine.getName(), autonomousRoutine);
         }
