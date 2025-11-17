@@ -105,6 +105,7 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                 1); 
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+    replaceSwerveModuleFeedforward(driveFF);
   }
 
   /**
@@ -386,9 +387,9 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param kV the velocity gain of the feedforward
    * @param kA the acceleration gain of the feedforward
    */
-  public void replaceSwerveModuleFeedforward(double kS, double kV, double kA)
+  public void replaceSwerveModuleFeedforward(SimpleMotorFeedforward feedforward)
   {
-    swerveDrive.replaceSwerveModuleFeedforward(new SimpleMotorFeedforward(kS, kV, kA));
+    swerveDrive.replaceSwerveModuleFeedforward(feedforward);
   }
 
   /**
