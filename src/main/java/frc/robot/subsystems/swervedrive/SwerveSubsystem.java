@@ -332,6 +332,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Command sysIdDriveMotorCommand()
   {
+    System.out.println("Running SysID Command!");
     return SwerveDriveTest.generateSysIdCommand(
         SwerveDriveTest.setDriveSysIdRoutine(
             new Config(),
@@ -496,7 +497,7 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.setGyro(new Rotation3d(0, 0, pose.getRotation().getRadians()));
     }
   }
-  
+
   /**
    * Drive according to the chassis robot oriented velocity.
    *
