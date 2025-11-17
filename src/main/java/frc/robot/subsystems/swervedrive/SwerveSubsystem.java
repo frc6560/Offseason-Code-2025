@@ -160,7 +160,7 @@ public class SwerveSubsystem extends SubsystemBase {
       () -> {
       },
       () -> {
-        tx = LimelightHelpers.getTX("limelight-left");
+        tx = LimelightHelpers.getTX("limelight-right");
         double tx_rad = Units.degreesToRadians(tx);
         tx_rad = filter.calculate(tx_rad);
         double thetaOutput = angleController.calculate(tx_rad, 0);
@@ -480,6 +480,8 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.driveFieldOriented(velocity.get());
     });
   }
+
+  /** Resets pose estimator to limelight pose */
 
   /**
    * Drive according to the chassis robot oriented velocity.
