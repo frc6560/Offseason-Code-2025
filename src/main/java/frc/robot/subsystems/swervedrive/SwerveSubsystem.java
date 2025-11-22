@@ -173,7 +173,7 @@ public class SwerveSubsystem extends SubsystemBase {
         tx_rad = filter.calculate(tx_rad);
         double thetaOutput = angleController.calculate(tx_rad, 0);
         SmartDashboard.getEntry("Theta Error").setDouble(angleController.getError());
-        if(Math.abs(tx) < 1.0){
+        if(Math.abs(tx_rad) > 0.017){
           drive(new ChassisSpeeds(
             0,
             0,
