@@ -216,7 +216,7 @@ public class SwerveSubsystem extends SubsystemBase {
               speedsRobotRelative = new ChassisSpeeds(
                   speedsRobotRelative.vxMetersPerSecond,
                   speedsRobotRelative.vyMetersPerSecond,
-                  - speedsRobotRelative.omegaRadiansPerSecond
+                  speedsRobotRelative.omegaRadiansPerSecond
               );
               swerveDrive.drive(
                   speedsRobotRelative,
