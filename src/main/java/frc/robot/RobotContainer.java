@@ -96,7 +96,6 @@ public class RobotContainer {
         driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroNoAprilTagsGyro)));
         driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
         driverXbox.rightBumper().onTrue(Commands.none());
-    
     }
 
     public Command getAutonomousCommand() {
