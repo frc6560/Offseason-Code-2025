@@ -105,7 +105,9 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                 1); 
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
-    replaceSwerveModuleFeedforward(driveFF);
+    swerveDrive.replaceSwerveModuleFeedforward(driveFF);
+    setMotorBrake(true);
+    setupPathPlanner();
   }
 
   /**
@@ -121,6 +123,8 @@ public class SwerveSubsystem extends SubsystemBase {
                                   Constants.MAX_SPEED,
                                   new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
                                   Rotation2d.fromDegrees(0)));
+    setMotorBrake(true);
+    setupPathPlanner();
   }
 
   @Override
