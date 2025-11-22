@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5824088541666654,
-        "y": 4.029600332754629
+        "x": 2.470797164351851,
+        "y": 3.3476446759259257
       },
       "isLocked": false,
       "linkedName": "shooterpose1"
     },
     {
       "anchor": {
-        "x": 1.235753399884258,
-        "y": 4.03612232349537
+        "x": 1.2282295702444426,
+        "y": 2.215028357592946
       },
       "prevControl": {
-        "x": 2.714440104166665,
-        "y": 4.021040219907407
+        "x": 2.24415798611111,
+        "y": 3.12118019386574
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "shooterpose2"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 89.93835851811995
+    "rotation": 43.12391183378319
   },
   "reversed": false,
   "folder": null,
