@@ -170,7 +170,7 @@ public class SwerveSubsystem extends SubsystemBase {
       () -> {
         tx = LimelightHelpers.getTX("limelight-right");
         double tx_rad = Units.degreesToRadians(tx);
-        tx_rad = filter.calculate(tx_rad);
+        tx_rad = - filter.calculate(tx_rad);
         double thetaOutput = angleController.calculate(tx_rad, 0);
         SmartDashboard.getEntry("Theta Error").setDouble(angleController.getError());
         if(Math.abs(tx_rad) > 0.017){
