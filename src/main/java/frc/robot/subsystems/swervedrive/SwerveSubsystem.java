@@ -137,7 +137,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public void updateVisionPoseEstimator(){
     Pose2d emptyPose = new Pose2d();
     // This is viewed top down, facing the front of the robot
-    String[] limelightNames = {"limelight-left"};
+    String[] limelightNames = {"limelight-right"};
     // Vision fusion
     for( String limelightName : limelightNames) {
       LimelightHelpers.SetRobotOrientation(limelightName, swerveDrive.getOdometryHeading().getDegrees(), 0, 0, 0, 0, 0);
